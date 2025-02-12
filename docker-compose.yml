@@ -1,0 +1,43 @@
+services:
+  php-docker-app:
+    build: .
+    container_name: php-docker-app
+    ports:
+      - "8101:8101" # Map the app's port to the host
+    volumes:
+      #- ./web:/var/www/html/web # Mount the `web` directory
+      - ./api:/var/www/html/api # Mount the `api` directory
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0-oracle # Compatible with ARM64
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: S3cur3P@ssw0rd!
+      MYSQL_DATABASE: trapiche_db
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: S3cur3P@ssw0rd!
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
