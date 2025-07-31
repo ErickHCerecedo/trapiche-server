@@ -1,0 +1,5 @@
+# Habilitar la reescritura de URLs
+RewriteEngine On
+
+# Redirigir las URLs tipo "noticias/{id}" a "noticias/{id}.html"
+RewriteRule ^noticias/([a-zA-Z0-9-]+)$ /noticias/$1.html [L]

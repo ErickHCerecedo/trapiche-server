@@ -27,7 +27,7 @@
                 WHERE p.id = :id_entrada"
             );
             
-            $query->bindParam(':id_entrada', $id_entrada, PDO::PARAM_INT);
+            $query->bindParam(':id_entrada', $id_entrada, PDO::PARAM_STR);
             $query->execute();
 
             while ($entrada = $query->fetch(PDO::FETCH_ASSOC)) {
