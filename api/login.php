@@ -16,21 +16,37 @@
 
 header('Access-Control-Allow-Origin: *'); // Considerar limitar esto en producción
 header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Content-Type: application/json');
+
+// Manejar preflight OPTIONS
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 require 'conexion.php';
 
 $response = array();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = isset($_POST["email"]) ? trim($_POST["email"]) : null;
-    $password = isset($_POST["password"]) ? trim($_POST["password"]) : null;
+
+    // Intentar leer como JSON primero
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    $email = isset($input["email"]) ? trim($input["email"]) : null;
+    $password = isset($input["password"]) ? trim($input["password"]) : null;
 
     if (empty($email) || empty($password)) {
         http_response_code(400);
         $response = [
             "status" => "error",
-            "message" => "Correo y contraseña son obligatorios."
+            "message" => "Correo y contraseña son obligatorios. ",
+            "data" => [
+                "email" => $email,
+                "password" => $password
+            ]
         ];
         echo json_encode($response);
         exit;
