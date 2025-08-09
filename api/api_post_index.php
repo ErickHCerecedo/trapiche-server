@@ -13,9 +13,23 @@
      */
 
     header('Access-Control-Allow-Origin: *');
-    header('Content-Type: text/html; charset=UTF-8'); 
+    header('Content-Type: application/json; charset=UTF-8');
 
 	include "conexion.php";
+
+    function json_response($status, $message, $data = null, $http_code = 200) {
+        http_response_code($http_code);
+        $response = [
+            'status' => $status,
+            'message' => $message
+        ];
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        exit;
+    }
+
 
     try {
         $query=$conexion->prepare("SELECT p.id, p.titulo, p.subtitulo, p.portada, p.resumen, u.nombre AS autor, p.created_at, p.estado
@@ -42,10 +56,10 @@
             array_push($entradas, $entrada_arr);
         }
         
-        echo json_encode($entradas);
+        json_response('success', 'Entradas obtenidas.', $entradas, 200);
 
     } catch (PDOException $e) {
-        echo json_encode(array('error' => $e->getMessage()));
+        json_response('error', 'Error en la base de datos.', ['details' => $e->getMessage()], 500);
     }
 
 ?>

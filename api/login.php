@@ -81,18 +81,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ':expires_at' => $expires_at
             ]);
 
-            // Establecer cookie segura
-            setcookie(
-                "session_token",
-                $session_token,
-                [
-                    "expires" => time() + 7776000, // 3 meses
-                    "path" => "/",
-                    "secure" => false,             // Solo por HTTPS
-                    "httponly" => false,           // No accesible por JavaScript
-                    "samesite" => "Lax"
-                ]
-            );
+            // Detectar si es local o producción
+            $is_local = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']);
+
+            $cookie_options = [
+                "expires" => time() + 7776000,
+                "path" => "/",
+                "secure" => !$is_local, // true en producción, false en local
+                "httponly" => false,
+                "samesite" => $is_local ? "Lax" : "None"
+            ];
+
+            // Solo poner domain en producción
+            if (!$is_local) {
+                $cookie_options["domain"] = ".trapichedigital.com.mx";
+            }
+
+            setcookie("session_token", $session_token, $cookie_options);
 
             // También devolver el token en el JSON (por si lo usas con fetch())
             $response = [

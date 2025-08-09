@@ -13,7 +13,7 @@
      * @copyright  Trapiche Digital
      */
 
-$env = 'development';
+$env = 'production';
 
 if ($env === 'development') {
     $server = 'db';
